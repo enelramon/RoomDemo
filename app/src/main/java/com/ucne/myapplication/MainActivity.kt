@@ -33,15 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Delete
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Query
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.Upsert
+import com.ucne.myapplication.data.local.database.TicketDb
+import com.ucne.myapplication.data.local.entities.TicketEntity
+import com.ucne.myapplication.presentation.TicketListScreen
 import com.ucne.roomdemo.ui.theme.RoomDemoTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -72,7 +67,7 @@ class MainActivity : ComponentActivity() {
                             .padding(8.dp)
                     ) {
 
-                        val tickets: List<Ticket> by getTickets().collectAsStateWithLifecycle(
+                        val tickets: List<TicketEntity> by getTickets().collectAsStateWithLifecycle(
                             initialValue = emptyList()
                         )
                         var ticketId by remember { mutableStateOf("") }
@@ -126,7 +121,7 @@ class MainActivity : ComponentActivity() {
                                     OutlinedButton(
                                         onClick = {
                                             saveTicket(
-                                                Ticket(
+                                                TicketEntity(
                                                     ticketId = ticketId.toIntOrNull(),
                                                     cliente = cliente,
                                                     asunto = asunto
@@ -163,13 +158,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun saveTicket(ticket: Ticket) {
+    fun saveTicket(ticket: TicketEntity) {
         GlobalScope.launch {
             ticketDb.ticketDao().save(ticket)
         }
     }
 
-    fun getTickets(): Flow<List<Ticket>> {
+    fun getTickets(): Flow<List<TicketEntity>> {
         return ticketDb.ticketDao().getAll()
     }
 
@@ -183,36 +178,6 @@ private fun TicketScreen(
 
 }
 
-@Composable
-private fun TicketListScreen(
-    tickets: List<Ticket>,
-    onVerTicket: (Ticket) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(4.dp)
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            items(tickets) { ticket ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onVerTicket(ticket) }
-                        .padding(16.dp)
-                ) {
-                    Text(text = ticket.ticketId.toString(), modifier = Modifier.weight(0.10f))
-                    Text(text = ticket.cliente, modifier = Modifier.weight(0.400f))
-                    Text(text = ticket.asunto, modifier = Modifier.weight(0.40f))
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
@@ -221,46 +186,4 @@ fun Preview() {
     }
 }
 
-//data/local/entities
-@Entity(tableName = "Tickets")
-data class Ticket(
-    @PrimaryKey
-    val ticketId: Int? = null,
-    var cliente: String = "",
-    var asunto: String = ""
-)
 
-//data/local/dao
-@Dao
-interface TicketDao {
-    @Upsert()
-    suspend fun save(ticket: Ticket)
-
-    @Query(
-        """
-        SELECT * 
-        FROM Tickets 
-        WHERE ticketId=:id  
-        LIMIT 1
-        """
-    )
-    suspend fun find(id: Int): Ticket?
-
-    @Delete
-    suspend fun delete(ticket: Ticket)
-
-    @Query("SELECT * FROM Tickets")
-    fun getAll(): Flow<List<Ticket>>
-}
-
-//data/local/database
-@Database(
-    entities = [
-        Ticket::class
-    ],
-    version = 1,
-    exportSchema = false
-)
-abstract class TicketDb : RoomDatabase() {
-    abstract fun ticketDao(): TicketDao
-}
