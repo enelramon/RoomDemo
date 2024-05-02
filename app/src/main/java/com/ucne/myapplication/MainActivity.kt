@@ -64,6 +64,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             RoomDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -86,6 +87,9 @@ class MainActivity : ComponentActivity() {
                                     .fillMaxWidth()
                                     .padding(8.dp)
                             ) {
+
+
+
 
                                 OutlinedTextField(
                                     label = { Text(text = "Cliente") },
