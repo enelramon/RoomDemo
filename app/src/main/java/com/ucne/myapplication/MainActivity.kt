@@ -4,23 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.ucne.myapplication.data.local.database.TicketDb
 import com.ucne.myapplication.data.repository.TicketRepository
-import com.ucne.myapplication.presentation.ticket.TicketListScreen
-import com.ucne.myapplication.presentation.ticket.TicketScreen
-import com.ucne.myapplication.presentation.ticket.TicketViewModel
 import com.ucne.roomdemo.ui.theme.RoomDemoTheme
+import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     private lateinit var ticketDb: TicketDb
@@ -39,30 +33,42 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RoomDemoTheme {
-                Surface {
-                    val viewModel: TicketViewModel = viewModel(
-                        factory = TicketViewModel.provideFactory(repository)
-                    )
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = Screen.TiketListScreen) {
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
-                                .padding(8.dp)
-                        ) {
-
-                            TicketScreen(viewModel = viewModel)
-                            TicketListScreen(viewModel = viewModel,
-                                onVerTicket = {
-
-                                })
-                        }
+                    composable<Screen.TiketListScreen> {
+                        Text(text = "Estas en TicketList")
                     }
                 }
+                /* Surface {
+                     val viewModel: TicketViewModel = viewModel(
+                         factory = TicketViewModel.provideFactory(repository)
+                     )
+                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
+                         Column(
+                             modifier = Modifier
+                                 .fillMaxSize()
+                                 .padding(innerPadding)
+                                 .padding(8.dp)
+                         ) {
+
+                             TicketScreen(viewModel = viewModel)
+                             TicketListScreen(viewModel = viewModel,
+                                 onVerTicket = {
+
+                                 })
+                         }
+                     }
+                 }*/
             }
         }
     }
+}
+
+sealed class Screen {
+    @Serializable
+    object TiketListScreen : Screen()
 }
 
 

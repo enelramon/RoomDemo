@@ -1,7 +1,7 @@
 [versions]
 agp = "8.4.0-rc02"
-kotlin = "1.9.23"
-coreKtx = "1.13.0"
+kotlin = "1.9.24"
+coreKtx = "1.14.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -11,7 +11,6 @@ activityCompose = "1.9.0"
 composeBom = "2024.05.00"
 navigationCompose = "2.8.0-beta01"
 roomRuntime = "2.6.1"
-kotlinSerialization = "1.9.24"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
