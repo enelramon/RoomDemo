@@ -7,4 +7,6 @@ class TicketRepository(private val ticketDao: TicketDao) {
     suspend fun saveTicket(ticket: TicketEntity) = ticketDao.save(ticket)
 
     fun getTickets() = ticketDao.getAll()
+
+   suspend fun getTicket(ticketId:Int) = ticketDao.find(ticketId)
 }

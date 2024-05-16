@@ -4,15 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.room.Room
 import com.ucne.myapplication.data.local.database.TicketDb
 import com.ucne.myapplication.data.repository.TicketRepository
+import com.ucne.myapplication.presentation.ticket.TicketListScreen
+import com.ucne.myapplication.presentation.ticket.TicketScreen
+import com.ucne.myapplication.presentation.ticket.TicketViewModel
 import com.ucne.roomdemo.ui.theme.RoomDemoTheme
 import kotlinx.serialization.Serializable
 
@@ -34,10 +38,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             RoomDemoTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Screen.TiketListScreen) {
+                NavHost(navController = navController, startDestination = Screen.TiketList) {
 
-                    composable<Screen.TiketListScreen> {
-                        Text(text = "Estas en TicketList")
+                    composable<Screen.TiketList> {
+                        TicketListScreen(
+                            viewModel = viewModel { TicketViewModel(repository,0) },
+                            onVerTicket = {
+                                navController.navigate(Screen.Ticket(it.ticketId ?: 0))
+                            })
+                    }
+
+                    composable<Screen.Ticket> {
+                        val args = it.toRoute<Screen.Ticket>()
+                        TicketScreen(viewModel = viewModel { TicketViewModel(repository,args.ticketId) })
                     }
                 }
                 /* Surface {
@@ -68,7 +81,10 @@ class MainActivity : ComponentActivity() {
 
 sealed class Screen {
     @Serializable
-    object TiketListScreen : Screen()
+    object TiketList : Screen()
+
+    @Serializable
+    data class Ticket(val ticketId: Int) : Screen()
 }
 
 

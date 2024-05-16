@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,104 +14,104 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ucne.myapplication.data.local.entities.TicketEntity
 import com.ucne.roomdemo.ui.theme.RoomDemoTheme
 
 @Composable
 fun TicketScreen(
     viewModel: TicketViewModel
 ) {
-    val tickets by viewModel.tickets.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     TicketBody(
-        onSaveTicket = { ticket ->
-            viewModel.saveTicket(ticket)
+        uiState = uiState,
+        onAsuntoChanged = viewModel::onAsuntoChanged,
+        onClienteChanged= viewModel::onClienteChanged,
+        onSaveTicket = {
+            viewModel.saveTicket()
         }
     )
 }
 
 @Composable
-fun TicketBody(onSaveTicket: (TicketEntity) -> Unit) {
-    var ticketId by remember { mutableStateOf("") }
-    var cliente by remember { mutableStateOf("") }
-    var asunto by remember { mutableStateOf("") }
+fun TicketBody(
+    uiState: TicketUIState,
+    onAsuntoChanged: (String)->Unit,
+    onClienteChanged:  (String)->Unit,
+    onSaveTicket: () -> Unit,
+) {
 
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(innerPadding)
                 .padding(8.dp)
         ) {
-
-
-            OutlinedTextField(
-                label = { Text(text = "Cliente") },
-                value = cliente,
-                onValueChange = { cliente = it },
+            ElevatedCard(
                 modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                label = { Text(text = "Asunto") },
-                value = asunto,
-                onValueChange = { asunto = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.padding(2.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                OutlinedButton(
-                    onClick = {
-                        ticketId = ""
-                        cliente = ""
-                        asunto = ""
-                    }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "new button"
+
+
+                    OutlinedTextField(
+                        label = { Text(text = "Cliente") },
+                        value = uiState.cliente,
+                        onValueChange = onClienteChanged,
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Text(text = "Nuevo")
-                }
-                OutlinedButton(
-                    onClick = {
-                        onSaveTicket(
-                            TicketEntity(
-                                ticketId = ticketId.toIntOrNull(),
-                                cliente = cliente,
-                                asunto = asunto
+
+                    OutlinedTextField(
+                        label = { Text(text = "Asunto") },
+                        value = uiState.asunto,
+                        onValueChange = onAsuntoChanged,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.padding(2.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "new button"
                             )
-                        )
-                        ticketId = ""
-                        cliente = ""
-                        asunto = ""
+                            Text(text = "Nuevo")
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                onSaveTicket()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "save button"
+                            )
+                            Text(text = "Guardar")
+                        }
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "save button"
-                    )
-                    Text(text = "Guardar")
                 }
+
             }
         }
-
     }
-
 }
 
 
@@ -118,7 +119,11 @@ fun TicketBody(onSaveTicket: (TicketEntity) -> Unit) {
 @Composable
 private fun TicketPreview() {
     RoomDemoTheme {
-        TicketBody() {
-        }
+        TicketBody(
+            uiState = TicketUIState(),
+            onSaveTicket = {},
+            onAsuntoChanged=  {},
+            onClienteChanged=  {},
+        )
     }
 }
