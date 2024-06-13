@@ -13,3 +13,4 @@ class TicketRepository @Inject constructor(
 
     suspend fun getTicket(ticketId: Int) = ticketDao.find(ticketId)
 }
+
