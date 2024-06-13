@@ -21,12 +21,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucne.roomdemo.ui.theme.RoomDemoTheme
 
 @Composable
 fun TicketScreen(
-    viewModel: TicketViewModel
+    viewModel: TicketViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     TicketBody(

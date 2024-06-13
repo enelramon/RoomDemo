@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ucne.myapplication.data.local.entities.TicketEntity
 import com.ucne.myapplication.presentation.components.TopAppBar
@@ -22,7 +23,7 @@ import com.ucne.roomdemo.ui.theme.RoomDemoTheme
 
 @Composable
 fun TicketListScreen(
-    viewModel: TicketViewModel,
+    viewModel: TicketViewModel = hiltViewModel(),
     onVerTicket: (TicketEntity) -> Unit
 ) {
     val tickets by viewModel.tickets.collectAsStateWithLifecycle()

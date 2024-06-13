@@ -6,34 +6,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import androidx.room.Room
-import com.ucne.myapplication.data.local.database.TicketDb
-import com.ucne.myapplication.data.repository.TicketRepository
 import com.ucne.myapplication.presentation.ticket.TicketListScreen
 import com.ucne.myapplication.presentation.ticket.TicketScreen
-import com.ucne.myapplication.presentation.ticket.TicketViewModel
 import com.ucne.roomdemo.ui.theme.RoomDemoTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var ticketDb: TicketDb
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        ticketDb = Room.databaseBuilder(
-            this,
-            TicketDb::class.java,
-            "Ticket.db"
-        )
-            .fallbackToDestructiveMigration()
-            .build()
-
-        val repository = TicketRepository(ticketDb.ticketDao())
         enableEdgeToEdge()
         setContent {
             RoomDemoTheme {
@@ -42,7 +30,6 @@ class MainActivity : ComponentActivity() {
 
                     composable<Screen.TiketList> {
                         TicketListScreen(
-                            viewModel = viewModel { TicketViewModel(repository,0) },
                             onVerTicket = {
                                 navController.navigate(Screen.Ticket(it.ticketId ?: 0))
                             })
@@ -50,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
                     composable<Screen.Ticket> {
                         val args = it.toRoute<Screen.Ticket>()
-                        TicketScreen(viewModel = viewModel { TicketViewModel(repository,args.ticketId) })
+                        TicketScreen()
                     }
                 }
                 /* Surface {
